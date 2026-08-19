@@ -1,0 +1,1047 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>大湾区有机污染物快速溯源数智平台</title>
+  <style>
+    :root {
+      --bg: #e8eef5;
+      --card: #fff;
+      --ink: #152033;
+      --muted: #5b6b7c;
+      --line: #d2dce8;
+      --blue: #1d4f8c;
+      --blue-deep: #123a6b;
+      --green: #1f6b52;
+      --shadow: 0 10px 30px rgba(18, 40, 70, .08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* Splash */
+    #view-splash {
+      min-height: 100vh;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(1200px 600px at 20% 10%, rgba(45, 110, 180, .22), transparent 60%),
+        radial-gradient(900px 500px at 85% 80%, rgba(31, 107, 82, .16), transparent 55%),
+        linear-gradient(160deg, #0f2a4a 0%, #1d4f8c 45%, #1a5f6e 100%);
+      color: #fff;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    #view-splash.active { display: flex; }
+    .splash-brand {
+      font-size: 13px;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      opacity: .78;
+      margin-bottom: 18px;
+    }
+    .splash-title {
+      margin: 0 auto;
+      max-width: 820px;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.25;
+      font-weight: 700;
+    }
+    .splash-sub {
+      margin: 18px auto 0;
+      max-width: 640px;
+      font-size: 15px;
+      opacity: .88;
+    }
+    .splash-cta {
+      margin-top: 36px;
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 34px;
+      background: #fff;
+      color: var(--blue-deep);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0,0,0,.18);
+    }
+    .splash-cta:hover { transform: translateY(-1px); }
+    .splash-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 12px;
+      margin: 40px auto 0;
+      max-width: 640px;
+    }
+    .splash-stats div {
+      padding: 14px 10px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 12px;
+      background: rgba(255,255,255,.08);
+    }
+    .splash-stats strong { display:block; font-size: 22px; }
+    .splash-stats span { display:block; margin-top: 4px; font-size: 12px; opacity: .8; }
+
+    /* App chrome */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+    }
+    .brand-btn {
+      border: 0;
+      background: transparent;
+      color: var(--blue-deep);
+      font: inherit;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .crumb {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .crumb button {
+      border: 0;
+      background: transparent;
+      color: var(--blue);
+      font: inherit;
+      cursor: pointer;
+      padding: 0;
+    }
+    .crumb .sep { opacity: .45; }
+
+    main.app { padding: 22px 0 56px; }
+    h1 { margin: 0; font-size: 26px; }
+    h2 { margin: 0; font-size: 20px; }
+    h3 { margin: 0 0 8px; font-size: 15px; }
+    .lead { margin: 8px 0 0; color: var(--muted); font-size: 14px; max-width: 720px; }
+    .muted { color: var(--muted); }
+    .small { font-size: 13px; }
+    .page-head { margin-bottom: 18px; }
+
+    .grid { display: grid; gap: 14px; }
+    .cards2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .cards3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    .cards4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
+    .two { grid-template-columns: 1fr 1fr; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+    }
+    .card.pad { padding: 16px; }
+
+    .module-card {
+      display: block;
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      padding: 20px 18px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      font: inherit;
+      color: inherit;
+      transition: border-color .15s, transform .15s;
+    }
+    .module-card:hover {
+      border-color: #8fb0d8;
+      transform: translateY(-2px);
+    }
+    .module-card .no {
+      display: inline-block;
+      margin-bottom: 10px;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+    }
+    .module-card strong {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    .module-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .module-card .go {
+      display: inline-block;
+      margin-top: 14px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .sub-card {
+      display: block;
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 16px;
+      cursor: pointer;
+      font: inherit;
+      color: inherit;
+    }
+    .sub-card:hover { border-color: #8fb0d8; }
+    .sub-card strong { display:block; margin-bottom: 6px; color: var(--blue-deep); }
+    .sub-card p { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .kpi span { display:block; color: var(--muted); font-size: 12px; }
+    .kpi strong { display:block; margin-top: 8px; color: var(--blue); font-size: 24px; line-height: 1.1; }
+    .kpi em { display:block; margin-top: 4px; font-style: normal; color: var(--muted); font-size: 12px; }
+
+    label { display:block; margin: 0 0 6px; font-size: 13px; font-weight: 700; }
+    input, textarea, select, button { font: inherit; }
+    input[type="text"], input[type="file"], textarea, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 10px;
+      background: #fff;
+    }
+    textarea { min-height: 100px; resize: vertical; }
+    button.primary {
+      border: 0;
+      border-radius: 8px;
+      padding: 9px 12px;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button.secondary {
+      border: 0;
+      border-radius: 8px;
+      padding: 9px 12px;
+      background: #e8eef5;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .form-stack { display:grid; gap: 12px; }
+    .split-buttons { display:grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .library-panel { display:grid; grid-template-columns: 280px 1fr; gap: 14px; }
+    .chart-box { border: 1px solid var(--line); border-radius: 10px; overflow:hidden; background:#fff; }
+    .chart-title {
+      display:flex; justify-content:space-between; gap:10px;
+      padding: 10px 12px; border-bottom: 1px solid var(--line); font-size: 13px;
+    }
+    svg { width: 100%; height: auto; display:block; background:#fff; }
+    .table-wrap { overflow:auto; max-height: 360px; border:1px solid var(--line); border-radius:10px; }
+    table { width:100%; border-collapse: collapse; font-size: 12px; }
+    th, td { padding: 8px 9px; border-bottom: 1px solid var(--line); text-align:left; white-space: nowrap; }
+    th { position: sticky; top: 0; background: #f7f9fc; }
+    .badge {
+      display:inline-block; padding: 2px 7px; border-radius: 999px;
+      background:#eef2f7; color:#334155; font-size: 11px;
+    }
+    .badge.CHO { background:#e8f0fa; color:#1f4e8c; }
+    .callout {
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #f8fafc;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .feast-bars { display:grid; gap: 10px; }
+    .feast-row { display:grid; grid-template-columns: 72px 1fr 54px; gap: 8px; align-items:center; }
+    .feast-track {
+      height: 18px; border-radius: 6px; overflow:hidden; display:flex; background:#edf1f6;
+    }
+    .feast-track span { display:block; height:100%; }
+    .legend { display:flex; flex-wrap:wrap; gap:10px; margin-top: 10px; }
+    .legend i {
+      display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:5px;
+    }
+    .note { margin-top: 10px; color: var(--muted); font-size: 12px; }
+    .tier-list { display:grid; gap: 8px; margin-top: 8px; }
+    .tier-item {
+      display:grid;
+      grid-template-columns: 88px 1fr auto;
+      gap: 10px;
+      align-items:center;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fafbfd;
+    }
+    .tier-bar {
+      height: 10px;
+      border-radius: 999px;
+      background: #e7edf5;
+      overflow: hidden;
+    }
+    .tier-bar > i { display:block; height:100%; background: var(--blue); }
+    .water-grid { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
+    .water-card {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      min-height: 84px;
+    }
+    .water-card b { display:block; margin-bottom: 4px; color: var(--blue); font-size: 13px; }
+    ul.tight { margin: 8px 0 0; padding-left: 18px; }
+    ul.tight li { margin: 3px 0; }
+    .back-row { margin-bottom: 14px; }
+    @media (max-width: 900px) {
+      .cards2, .cards3, .cards4, .two, .library-panel, .water-grid, .splash-stats {
+        grid-template-columns: 1fr;
+      }
+      .water-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 开屏 -->
+  <section id="view-splash" class="view active">
+    <div>
+      <div class="splash-brand">GBA SOURCE TRACKING</div>
+      <h1 class="splash-title">粤港澳大湾区天然有机污染物<br>快速溯源数智平台</h1>
+      <p class="splash-sub">集成河口—河网、城市河流与污水终端分子指纹库，支持光学快速分类、口门来源解析与污染物名录比对。</p>
+      <button class="splash-cta" type="button" data-go="hub">进入平台</button>
+      <div class="splash-stats">
+        <div><strong>184</strong><span>河口—河网样品</span></div>
+        <div><strong>29</strong><span>城市河流样品</span></div>
+        <div><strong>64</strong><span>污水终端样品</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 平台主体 -->
+  <div id="app-shell" class="view">
+    <div class="topbar">
+      <div class="shell topbar-inner">
+        <button class="brand-btn" type="button" data-go="hub">快速溯源数智平台</button>
+        <div class="crumb" id="crumb"></div>
+      </div>
+    </div>
+
+    <main class="shell app">
+      <!-- 板块首页 -->
+      <section id="view-hub" class="view">
+        <div class="page-head">
+          <h1>功能模块</h1>
+          <p class="lead">选择模块进入。可从数据库构建、三库特征、光学检测、口门溯源到名录与样品比对逐步使用。</p>
+        </div>
+        <div class="grid cards2">
+          <button class="module-card" type="button" data-go="build">
+            <span class="no">01</span>
+            <strong>数据库构建</strong>
+            <p>样品体系、检测指标与元数据入库规则。</p>
+            <span class="go">进入 →</span>
+          </button>
+          <button class="module-card" type="button" data-go="features">
+            <span class="no">02</span>
+            <strong>三库特征</strong>
+            <p>河口库、城市河流子库、污水终端库分区特征与调用方式。</p>
+            <span class="go">进入 →</span>
+          </button>
+          <button class="module-card" type="button" data-go="optical">
+            <span class="no">03</span>
+            <strong>光学快速检测</strong>
+            <p>基于荧光与吸收光谱的水体类型快速归类。</p>
+            <span class="go">进入 →</span>
+          </button>
+          <button class="module-card" type="button" data-go="feast">
+            <span class="no">04</span>
+            <strong>FEAST 口门溯源</strong>
+            <p>珠江口主要口门的河系、城市河流与污水厂贡献结构。</p>
+            <span class="go">进入 →</span>
+          </button>
+          <button class="module-card" type="button" data-go="terminal">
+            <span class="no">05</span>
+            <strong>终端库与污染物类别</strong>
+            <p>分级约束指纹库、污染物类别与社会经济关联摘要。</p>
+            <span class="go">进入 →</span>
+          </button>
+          <button class="module-card" type="button" data-go="tools">
+            <span class="no">06</span>
+            <strong>名录比对与样品比对</strong>
+            <p>污染物名录检索，以及样品分子式与终端库比对。</p>
+            <span class="go">进入 →</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 01 建库 -->
+      <section id="view-build" class="view">
+        <div class="page-head">
+          <h2>数据库构建</h2>
+          <p class="lead">完成野外采样、DOC / EEM / FT-ICR MS 检测与质控归档，形成可检索、可比对的元数据库。</p>
+        </div>
+        <div class="grid cards3" style="margin-bottom:14px">
+          <div class="card pad kpi"><span>河口—河网背景库</span><strong>184 样</strong><em>西江 / 东江 / 口门</em></div>
+          <div class="card pad kpi"><span>城市河流子库</span><strong>29 样</strong><em>背景与高影响河段</em></div>
+          <div class="card pad kpi"><span>污水终端排放库</span><strong>64 样</strong><em>点源指纹分级入库</em></div>
+        </div>
+        <div class="grid cards3">
+          <article class="card pad">
+            <h3>样品与检测</h3>
+            <p class="small muted">同步获取水温、溶解氧、氧化还原电位、盐度等理化参数，以及土地利用、夜间灯光、GDP 等社会经济背景；完成 DOC、三维荧光与 FT-ICR MS 测试。</p>
+          </article>
+          <article class="card pad">
+            <h3>元数据字段</h3>
+            <p class="small muted">点位与批次、环境与社会经济背景、荧光指数与 PARAFAC 组分、分子式及 H/C、O/C、AI_mod、DBE、CRAM 等参数。</p>
+          </article>
+          <article class="card pad">
+            <h3>入库规则</h3>
+            <p class="small muted">按场景划分为河口库、城市河流子库、污水终端库；终端库按出现频率建立分级约束，并与权威污染物名录比对。</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- 02 三库 -->
+      <section id="view-features" class="view">
+        <div class="page-head">
+          <h2>三库特征</h2>
+          <p class="lead">请选择子库查看特征说明与平台调用方式。</p>
+        </div>
+        <div class="grid cards3">
+          <button class="sub-card" type="button" data-go="feat-estuary">
+            <strong>河口—河网背景库</strong>
+            <p>西江、东江与口门端元分异；为口门溯源提供河系背景。</p>
+          </button>
+          <button class="sub-card" type="button" data-go="feat-urban">
+            <strong>城市河流子库</strong>
+            <p>背景河段与高影响河段；作为城镇输移端元参与解析。</p>
+          </button>
+          <button class="sub-card" type="button" data-go="feat-wwtp">
+            <strong>污水终端排放库</strong>
+            <p>点源指纹、分级核心库与污染物类别信息。</p>
+          </button>
+        </div>
+      </section>
+
+      <section id="view-feat-estuary" class="view">
+        <div class="back-row"><button class="secondary" type="button" data-go="features">← 返回三库特征</button></div>
+        <div class="page-head">
+          <h2>河口—河网背景库</h2>
+          <p class="lead">刻画珠江口河系背景与口门混合过程中的荧光与分子分异。</p>
+        </div>
+        <div class="card pad">
+          <h3>主要特征</h3>
+          <ul class="tight small muted">
+            <li>西江、东江与口门区在荧光端元与分子参数上存在稳定分异</li>
+            <li>沿程由陆源腐殖质主导向生物源 / 混合源增强</li>
+            <li>咸潮、耗氧等过程可引起短期指纹波动</li>
+          </ul>
+          <p class="note">在 FEAST 中作为西江、东江、北江河系端元的指纹来源。</p>
+        </div>
+      </section>
+
+      <section id="view-feat-urban" class="view">
+        <div class="back-row"><button class="secondary" type="button" data-go="features">← 返回三库特征</button></div>
+        <div class="page-head">
+          <h2>城市河流子库</h2>
+          <p class="lead">识别城镇河网背景河段与高影响河段，补充时间变化信息。</p>
+        </div>
+        <div class="card pad">
+          <h3>主要特征</h3>
+          <ul class="tight small muted">
+            <li>背景河段与高影响河段分子参数明显分异</li>
+            <li>月度监测可区分背景态、扰动态与持续偏移态</li>
+            <li>降水径流、土地利用与气温等环境因子驱动分子组成变化</li>
+          </ul>
+          <p class="note">在口门溯源中作为城镇输移端元；横门、鸡啼门、洪奇沥等口门城镇信号相对抬升。</p>
+        </div>
+      </section>
+
+      <section id="view-feat-wwtp" class="view">
+        <div class="back-row"><button class="secondary" type="button" data-go="features">← 返回三库特征</button></div>
+        <div class="page-head">
+          <h2>污水终端排放库</h2>
+          <p class="lead">表征污水处理厂终端出水点源指纹，并支持名录筛查。</p>
+        </div>
+        <div class="card pad">
+          <h3>主要特征</h3>
+          <ul class="tight small muted">
+            <li>终端出水分子组成与区域 GDP、夜间灯光等发展水平相关</li>
+            <li>工业化学品、PPCPs 等为主要潜在污染物类别</li>
+            <li>按出现频率建立全样及 &gt;25% / &gt;50% / &gt;75% / 100% 分级核心库</li>
+          </ul>
+          <p class="note">作为点源端元参与口门解析，并支撑名录比对与样品分子式比对。</p>
+        </div>
+      </section>
+
+      <!-- 03 光学 -->
+      <section id="view-optical" class="view">
+        <div class="page-head">
+          <h2>光学快速检测</h2>
+          <p class="lead">以吸收光谱与三维荧光实现水体类型快速归类，异常样品再进入分子指纹确认。</p>
+        </div>
+        <div class="grid two" style="margin-bottom:14px">
+          <article class="card pad">
+            <h3>方法</h3>
+            <p class="small muted">吸收光谱与 EEM 表征 CDOM / FDOM；随机森林基于完整 EEM 信息识别水体类型，并定位关键荧光判别区域。</p>
+          </article>
+          <article class="card pad">
+            <h3>验证对象</h3>
+            <p class="small muted">香港近岸复杂水循环系统：雨水、雨洪径流、河水、海水、海滩地下水、沉积物孔隙水及污水等七类水体。</p>
+          </article>
+        </div>
+        <div class="water-grid">
+          <div class="water-card"><b>雨水</b><span class="small muted">大气输入</span></div>
+          <div class="water-card"><b>雨洪径流</b><span class="small muted">地表冲刷</span></div>
+          <div class="water-card"><b>河水</b><span class="small muted">地表输送</span></div>
+          <div class="water-card"><b>海水</b><span class="small muted">近岸混合</span></div>
+          <div class="water-card"><b>海滩地下水</b><span class="small muted">地下水交换</span></div>
+          <div class="water-card"><b>沉积物孔隙水</b><span class="small muted">沉积物交换</span></div>
+          <div class="water-card"><b>污水</b><span class="small muted">人为排放</span></div>
+          <div class="water-card"><b>应用</b><span class="small muted">快速归类与异常提示</span></div>
+        </div>
+      </section>
+
+      <!-- 04 FEAST -->
+      <section id="view-feast" class="view">
+        <div class="page-head">
+          <h2>FEAST 口门来源解析</h2>
+          <p class="lead">汇为珠江口主要口门；源为西江、东江、北江、城市河流与污水厂。基于约 2.8 万分子式估算各端元组成贡献。</p>
+        </div>
+        <div class="grid two">
+          <div class="card pad">
+            <label for="gateSelect">选择口门</label>
+            <select id="gateSelect"></select>
+            <div id="feastDetail" class="feast-bars" style="margin-top:14px"></div>
+            <div class="legend" id="feastLegend"></div>
+            <p class="note">虎门偏东江，污水厂贡献相对更高；横门城市河流抬升；虎跳门偏西江。</p>
+          </div>
+          <div class="card pad">
+            <h3>全部口门贡献结构</h3>
+            <div id="feastAll" class="feast-bars" style="margin-top:10px"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 终端库 -->
+      <section id="view-terminal" class="view">
+        <div class="page-head">
+          <h2>终端库与污染物类别</h2>
+          <p class="lead">展示污水终端指纹库的分级约束、潜在污染物类别与分子组成概览。</p>
+        </div>
+        <div class="grid two">
+          <div class="card pad">
+            <h3>分级约束</h3>
+            <p class="small muted">由全样到 100% 核心库逐步收紧，用于锁定城镇污水共性指纹。</p>
+            <div class="tier-list" id="tierList"></div>
+          </div>
+          <div class="card pad">
+            <h3>潜在污染物类别</h3>
+            <div class="chart-box" style="margin-top:10px">
+              <div class="chart-title"><strong>类别占比</strong></div>
+              <svg id="pollutantChart"></svg>
+            </div>
+          </div>
+        </div>
+        <div class="grid two" style="margin-top:14px">
+          <div class="card pad">
+            <h3>元素组成概览</h3>
+            <div class="chart-box" style="margin-top:10px">
+              <div class="chart-title"><strong>全样点累计</strong></div>
+              <svg id="libraryClassChart"></svg>
+            </div>
+          </div>
+          <div class="card pad">
+            <h3>社会经济与水质关联</h3>
+            <div class="chart-box" style="margin-top:10px">
+              <div class="chart-title"><strong>相关系数</strong></div>
+              <svg id="correlationChart"></svg>
+            </div>
+          </div>
+        </div>
+        <div class="card pad" style="margin-top:14px">
+          <h3>核心分子检索</h3>
+          <div class="library-panel" style="margin-top:12px">
+            <aside class="form-stack">
+              <div>
+                <label for="librarySearch">分子式</label>
+                <input id="librarySearch" type="text" placeholder="例如 C10H14O4">
+              </div>
+              <div>
+                <label for="classFilter">元素类别</label>
+                <select id="classFilter"><option value="">全部</option></select>
+              </div>
+              <button id="resetLibrary" type="button" class="secondary">清空</button>
+              <div class="kpi"><span>核心库规模</span><strong id="kpiLibrary">0</strong></div>
+            </aside>
+            <div class="grid">
+              <div class="chart-box">
+                <div class="chart-title"><strong>Van Krevelen</strong></div>
+                <svg id="vkChart"></svg>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>分子式</th><th>类别</th><th>O/C</th><th>H/C</th><th>定位</th></tr></thead>
+                  <tbody id="libraryRows"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 06 工具入口 -->
+      <section id="view-tools" class="view">
+        <div class="page-head">
+          <h2>名录比对与样品比对</h2>
+          <p class="lead">选择下方工具继续。</p>
+        </div>
+        <div class="grid cards2">
+          <button class="sub-card" type="button" data-go="pollutants">
+            <strong>污染物名录比对</strong>
+            <p>按分子式、名称或用途类别检索名录映射结果。</p>
+          </button>
+          <button class="sub-card" type="button" data-go="compare">
+            <strong>样品分子式比对</strong>
+            <p>上传或粘贴分子式，与终端核心指纹核对命中情况。</p>
+          </button>
+        </div>
+      </section>
+
+      <section id="view-pollutants" class="view">
+        <div class="back-row"><button class="secondary" type="button" data-go="tools">← 返回工具</button></div>
+        <div class="page-head">
+          <h2>污染物名录比对</h2>
+          <p class="lead">指纹库与权威污染物名录比对后的映射检索。</p>
+        </div>
+        <div class="card pad grid">
+          <div class="grid cards4" id="pollutantKpis"></div>
+          <div class="grid two">
+            <div>
+              <label for="pollutantSearch">检索</label>
+              <input id="pollutantSearch" type="text" placeholder="分子式 / 名称 / 类别">
+            </div>
+            <div>
+              <label for="pollutantFilter">用途类别</label>
+              <select id="pollutantFilter"><option value="">全部类别</option></select>
+            </div>
+          </div>
+          <div class="pill-line muted small">映射记录 <span id="pollutantCount">0</span> · 当前显示 <span id="kpiPollutants">0</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>分子式</th><th>污染物名称</th><th>InChIKey</th><th>建议类别</th><th>最终类别</th></tr></thead>
+              <tbody id="pollutantRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-compare" class="view">
+        <div class="back-row"><button class="secondary" type="button" data-go="tools">← 返回工具</button></div>
+        <div class="page-head">
+          <h2>样品分子式比对</h2>
+          <p class="lead">上传 CSV 或粘贴分子式，与污水终端核心指纹比对。</p>
+        </div>
+        <div class="card pad library-panel">
+          <aside class="form-stack">
+            <div>
+              <label for="ftFile">上传 CSV</label>
+              <input id="ftFile" type="file" accept=".csv,text/csv">
+            </div>
+            <div>
+              <label for="manualInput">或粘贴分子式</label>
+              <textarea id="manualInput" placeholder="C10H14O4, C8H9NO2 ..."></textarea>
+            </div>
+            <div class="split-buttons">
+              <button id="compareBtn" class="primary" type="button">开始比对</button>
+              <button id="demoCompareBtn" class="secondary" type="button">示例比对</button>
+            </div>
+            <div class="grid cards3">
+              <div class="kpi"><span>输入分子</span><strong id="kpiInput">0</strong></div>
+              <div class="kpi"><span>库内命中</span><strong id="kpiHits">0</strong></div>
+              <div class="kpi"><span>命中率</span><strong id="kpiRate">0%</strong></div>
+            </div>
+          </aside>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>输入分子式</th><th>归一键</th><th>是否命中</th><th>库内类别</th><th>定位</th></tr></thead>
+              <tbody id="compareRows"><tr><td colspan="5" class="muted">上传或粘贴分子式后查看结果</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="data.js"></script>
+  <script>
+    const ROUTES = {
+      splash: { title: "开屏", parent: null },
+      hub: { title: "功能模块", parent: null },
+      build: { title: "数据库构建", parent: "hub" },
+      features: { title: "三库特征", parent: "hub" },
+      "feat-estuary": { title: "河口—河网背景库", parent: "features" },
+      "feat-urban": { title: "城市河流子库", parent: "features" },
+      "feat-wwtp": { title: "污水终端排放库", parent: "features" },
+      optical: { title: "光学快速检测", parent: "hub" },
+      feast: { title: "FEAST 口门溯源", parent: "hub" },
+      terminal: { title: "终端库与污染物类别", parent: "hub" },
+      tools: { title: "名录比对与样品比对", parent: "hub" },
+      pollutants: { title: "污染物名录比对", parent: "tools" },
+      compare: { title: "样品分子式比对", parent: "tools" }
+    };
+
+    function go(route) {
+      if (!ROUTES[route]) return;
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      if (route === "splash") {
+        document.getElementById("view-splash").classList.add("active");
+        location.hash = "splash";
+        return;
+      }
+      document.getElementById("app-shell").classList.add("active");
+      const page = document.getElementById("view-" + route);
+      if (page) page.classList.add("active");
+      renderCrumb(route);
+      location.hash = route;
+      window.scrollTo(0, 0);
+    }
+
+    function renderCrumb(route) {
+      const el = document.getElementById("crumb");
+      const chain = [];
+      let cur = route;
+      while (cur && ROUTES[cur]) {
+        chain.unshift(cur);
+        cur = ROUTES[cur].parent;
+      }
+      const parts = ['<button type="button" data-go="hub">首页</button>'];
+      chain.forEach((id, i) => {
+        if (id === "hub") return;
+        parts.push('<span class="sep">/</span>');
+        if (i === chain.length - 1) parts.push(`<span>${ROUTES[id].title}</span>`);
+        else parts.push(`<button type="button" data-go="${id}">${ROUTES[id].title}</button>`);
+      });
+      el.innerHTML = parts.join("");
+    }
+
+    document.body.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-go]");
+      if (!btn) return;
+      go(btn.getAttribute("data-go"));
+    });
+
+    const FEAST_GATES = [{"id":"YAMEN","name":"崖门","XIJIANG":0.5487,"DONGJIANG":0.2709,"BEIJIANG":0.1228,"Urban_river":0.0438,"WWTP":0.0075,"Unknown":0.0063},{"id":"HUMEN","name":"虎门","XIJIANG":0.2879,"DONGJIANG":0.5101,"BEIJIANG":0.1011,"Urban_river":0.0579,"WWTP":0.0387,"Unknown":0.0044},{"id":"MODAOMEN","name":"磨刀门","XIJIANG":0.5497,"DONGJIANG":0.2267,"BEIJIANG":0.1162,"Urban_river":0.0951,"WWTP":0.0,"Unknown":0.0124},{"id":"HUTIAOMEN","name":"虎跳门","XIJIANG":0.6331,"DONGJIANG":0.1968,"BEIJIANG":0.0724,"Urban_river":0.0896,"WWTP":0.0018,"Unknown":0.0064},{"id":"JITIMEN","name":"鸡啼门","XIJIANG":0.5903,"DONGJIANG":0.157,"BEIJIANG":0.0746,"Urban_river":0.1644,"WWTP":0.003,"Unknown":0.0107},{"id":"HENGMEN","name":"横门","XIJIANG":0.5004,"DONGJIANG":0.2425,"BEIJIANG":0.016,"Urban_river":0.2254,"WWTP":0.0023,"Unknown":0.0134},{"id":"JIAOMEN","name":"蕉门","XIJIANG":0.3986,"DONGJIANG":0.3406,"BEIJIANG":0.1532,"Urban_river":0.1006,"WWTP":0.0001,"Unknown":0.0068},{"id":"HONGQILI","name":"洪奇沥","XIJIANG":0.4151,"DONGJIANG":0.3836,"BEIJIANG":0.0432,"Urban_river":0.1462,"WWTP":0.0,"Unknown":0.0119}];
+    const FEAST_SRC = [
+      {key:"XIJIANG", label:"西江", color:"#4C78A8"},
+      {key:"DONGJIANG", label:"东江", color:"#F58518"},
+      {key:"BEIJIANG", label:"北江", color:"#54A24B"},
+      {key:"Urban_river", label:"城市河流", color:"#E45756"},
+      {key:"WWTP", label:"污水厂", color:"#B279A2"}
+    ];
+
+    const fingerprintLibrary = window.GBA_PROJECT_DATA?.fingerprintLibrary || [];
+    const pollutantMatches = window.GBA_PROJECT_DATA?.pollutantMatches || [];
+    const classSummary = window.GBA_PROJECT_DATA?.classSummary || [];
+
+    const pollutantSummary = [
+      {label:"工业化学品", value:45.3, color:"#a85c1c"},
+      {label:"PPCPs", value:30.0, color:"#a33b45"},
+      {label:"表面活性剂/农药等", value:12.8, color:"#1f6b52"},
+      {label:"其他", value:11.9, color:"#667085"}
+    ];
+    const correlations = [
+      {label:"DOC-GDP", value:.42, color:"#1f4e8c"},
+      {label:"DOC-夜光", value:.41, color:"#1f4e8c"},
+      {label:"O/C-夜光", value:.32, color:"#1f6b52"},
+      {label:"PO4-夜光", value:.31, color:"#1f6b52"},
+      {label:"DBE-夜光", value:-.43, color:"#a33b45"},
+      {label:"FI-夜光", value:-.38, color:"#a33b45"}
+    ];
+    const tierDefs = [
+      {name:"全样", desc:"最宽检索范围", width:100},
+      {name:">25%", desc:"去除偶发检出", width:78},
+      {name:">50%", desc:"保留稳定共现", width:58},
+      {name:">75%", desc:"强化共性约束", width:38},
+      {name:"100%", desc:"核心指纹库", width:22}
+    ];
+
+    const els = {
+      search: document.getElementById("librarySearch"),
+      filter: document.getElementById("classFilter"),
+      libraryRows: document.getElementById("libraryRows"),
+      pollutantSearch: document.getElementById("pollutantSearch"),
+      pollutantFilter: document.getElementById("pollutantFilter"),
+      pollutantRows: document.getElementById("pollutantRows"),
+      pollutantCount: document.getElementById("pollutantCount"),
+      kpiPollutants: document.getElementById("kpiPollutants"),
+      pollutantKpis: document.getElementById("pollutantKpis"),
+      ftFile: document.getElementById("ftFile"),
+      manualInput: document.getElementById("manualInput"),
+      compareRows: document.getElementById("compareRows"),
+      kpiLibrary: document.getElementById("kpiLibrary"),
+      kpiInput: document.getElementById("kpiInput"),
+      kpiHits: document.getElementById("kpiHits"),
+      kpiRate: document.getElementById("kpiRate"),
+      gateSelect: document.getElementById("gateSelect"),
+      feastDetail: document.getElementById("feastDetail"),
+      feastAll: document.getElementById("feastAll"),
+      feastLegend: document.getElementById("feastLegend"),
+      tierList: document.getElementById("tierList")
+    };
+
+    function key(formula) {
+      const counts = {};
+      String(formula || "").replace(/[^A-Za-z0-9]/g, "").replace(/([A-Z][a-z]?)(\d*)/g, (_, e, n) => {
+        counts[e] = (counts[e] || 0) + Number(n || 1);
+      });
+      return ["C","H","N","O","P","S"].filter(e => counts[e]).map(e => `${e}${counts[e] === 1 ? "" : counts[e]}`).join("");
+    }
+    function parseCsv(text) {
+      const rows = [];
+      let row = [], cell = "", quote = false;
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i], n = text[i + 1];
+        if (c === '"' && quote && n === '"') { cell += '"'; i++; }
+        else if (c === '"') quote = !quote;
+        else if (c === "," && !quote) { row.push(cell.trim()); cell = ""; }
+        else if ((c === "\n" || c === "\r") && !quote) {
+          if (c === "\r" && n === "\n") i++;
+          row.push(cell.trim());
+          if (row.some(Boolean)) rows.push(row);
+          row = []; cell = "";
+        } else cell += c;
+      }
+      row.push(cell.trim());
+      if (row.some(Boolean)) rows.push(row);
+      return rows;
+    }
+    function formulasFromCsv(text) {
+      const rows = parseCsv(text);
+      if (rows.length < 2) return [];
+      const headers = rows[0].map(h => h.toLowerCase());
+      const idx = headers.findIndex(h => ["formula","formula_norm","molecule","molecularformula"].includes(h));
+      if (idx < 0) throw new Error("CSV 中未找到分子式字段");
+      return rows.slice(1).map(r => r[idx]).filter(Boolean);
+    }
+    function esc(v) {
+      return String(v ?? "").replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[s]));
+    }
+
+    function drawBar(svgId, data, signed=false) {
+      const svg = document.getElementById(svgId);
+      if (!svg) return;
+      const w=560,h=290,left=58,right=22,top=22,bottom=54;
+      const max=Math.max(.1,...data.map(d=>Math.abs(d.value)));
+      const zeroY = signed ? top+(h-top-bottom)/2 : h-bottom;
+      const bw=(w-left-right)/data.length;
+      const bars=data.map((d,i)=>{
+        const x=left+i*bw+8;
+        const barH=Math.abs(d.value)/max*(signed?85:h-top-bottom);
+        const y=signed?(d.value>=0?zeroY-barH:zeroY):h-bottom-barH;
+        return `<rect x="${x}" y="${y}" width="${Math.max(18,bw-16)}" height="${barH}" rx="4" fill="${d.color||"#1f4e8c"}"></rect>
+          <text x="${x+Math.max(18,bw-16)/2}" y="${d.value>=0?y-6:y+barH+15}" text-anchor="middle" font-size="11" fill="#344054">${signed?d.value.toFixed(2):d.value}</text>
+          <text x="${x+Math.max(18,bw-16)/2}" y="${h-24}" text-anchor="middle" font-size="11" fill="#667085">${esc(d.label)}</text>`;
+      }).join("");
+      svg.setAttribute("viewBox",`0 0 ${w} ${h}`);
+      svg.innerHTML=`<line x1="${left}" y1="${zeroY}" x2="${w-right}" y2="${zeroY}" stroke="#d8dee8"></line><line x1="${left}" y1="${top}" x2="${left}" y2="${h-bottom}" stroke="#d8dee8"></line>${bars}`;
+    }
+    function drawScatter(svgId, data) {
+      const svg=document.getElementById(svgId);
+      if (!svg) return;
+      const w=560,h=290,l=52,r=20,t=20,b=44;
+      const colors={CHO:"#1f4e8c",CHON:"#5b3aa8",CHOS:"#a85c1c",CHONS:"#a33b45",CHOP:"#1f6b52"};
+      if (!data.length) {
+        svg.setAttribute("viewBox",`0 0 ${w} ${h}`);
+        svg.innerHTML=`<text x="${w/2}" y="${h/2}" text-anchor="middle" font-size="13" fill="#667085">输入分子式后显示</text>`;
+        return;
+      }
+      const pts=data.map(d=>{
+        const x=l+Math.min(1,d.oc)*(w-l-r);
+        const y=h-b-Math.min(2,d.hc)/2*(h-t-b);
+        return `<circle cx="${x}" cy="${y}" r="4.5" fill="${colors[d.cls]||"#667085"}" opacity=".8"><title>${esc(d.formula)} ${d.cls}</title></circle>`;
+      }).join("");
+      svg.setAttribute("viewBox",`0 0 ${w} ${h}`);
+      svg.innerHTML=`<line x1="${l}" y1="${h-b}" x2="${w-r}" y2="${h-b}" stroke="#d8dee8"></line><line x1="${l}" y1="${t}" x2="${l}" y2="${h-b}" stroke="#d8dee8"></line><text x="${w/2}" y="${h-9}" text-anchor="middle" font-size="12" fill="#667085">O/C</text><text x="14" y="${h/2}" transform="rotate(-90 14 ${h/2})" text-anchor="middle" font-size="12" fill="#667085">H/C</text>${pts}`;
+    }
+    function drawHorizontalBar(svgId, data) {
+      const svg=document.getElementById(svgId);
+      if (!svg) return;
+      const w=560,h=290,l=92,r=38,t=26,rowH=34;
+      const colors={CHO:"#1f4e8c",CHON:"#5b3aa8",CHOS:"#a85c1c",CHONS:"#a33b45",CHOP:"#1f6b52",CHONP:"#3f6f8f",CHOSP:"#8a5a2b"};
+      const max=Math.max(1,...data.map(d=>d.value));
+      const rows=data.slice(0,7).map((d,i)=>{
+        const y=t+i*rowH; const width=d.value/max*(w-l-r);
+        return `<text x="${l-12}" y="${y+18}" text-anchor="end" font-size="12" fill="#344054">${esc(d.label)}</text>
+          <rect x="${l}" y="${y+4}" width="${width}" height="18" rx="4" fill="${colors[d.label]||"#1f4e8c"}"></rect>
+          <text x="${l+width+8}" y="${y+18}" font-size="12" fill="#344054">${d.value}</text>`;
+      }).join("");
+      svg.setAttribute("viewBox",`0 0 ${w} ${h}`);
+      svg.innerHTML=`<line x1="${l}" y1="${h-34}" x2="${w-r}" y2="${h-34}" stroke="#d8dee8"></line>${rows}`;
+    }
+
+    function renderTiers() {
+      els.tierList.innerHTML = tierDefs.map(t => `
+        <div class="tier-item">
+          <strong>${esc(t.name)}</strong>
+          <div class="tier-bar"><i style="width:${t.width}%"></i></div>
+          <span class="small muted">${esc(t.desc)}</span>
+        </div>`).join("");
+    }
+
+    function renderLibrary() {
+      const q=els.search.value.trim().toLowerCase();
+      const cls=els.filter.value;
+      els.kpiLibrary.textContent = fingerprintLibrary.length;
+      if (!q && !cls) {
+        els.libraryRows.innerHTML = `<tr><td colspan="5" class="muted">输入分子式开始检索</td></tr>`;
+        drawScatter("vkChart", []);
+        return;
+      }
+      const rows=fingerprintLibrary.filter(d => (!q || d.formula.toLowerCase().includes(q) || d.cls.toLowerCase().includes(q)) && (!cls || d.cls===cls)).slice(0,50);
+      els.libraryRows.innerHTML = rows.length
+        ? rows.map(d=>`<tr><td>${esc(d.formula)}</td><td><span class="badge ${d.cls}">${d.cls}</span></td><td>${Number(d.oc).toFixed(3)}</td><td>${Number(d.hc).toFixed(3)}</td><td>${esc(d.tier)}</td></tr>`).join("")
+        : `<tr><td colspan="5" class="muted">无匹配结果</td></tr>`;
+      drawScatter("vkChart", rows);
+    }
+
+    function catOf(d){ return d.finalCategory || d.suggestedCategory || "未分类"; }
+
+    function renderPollutantKpis() {
+      const counts = {};
+      pollutantMatches.forEach(d => {
+        const c = catOf(d);
+        counts[c] = (counts[c] || 0) + 1;
+      });
+      const focus = [
+        {key:"PPCPs", label:"PPCPs"},
+        {key:"dyestuff", label:"染料"},
+        {key:"plasticizer", label:"增塑剂"},
+        {key:"pesticide", label:"农药"}
+      ];
+      els.pollutantKpis.innerHTML = focus.map(f => `
+        <div class="kpi">
+          <span>${f.label}</span>
+          <strong>${counts[f.key] || 0}</strong>
+        </div>`).join("");
+      els.pollutantCount.textContent = pollutantMatches.length;
+    }
+
+    function renderPollutants() {
+      const q=els.pollutantSearch.value.trim().toLowerCase();
+      const category=els.pollutantFilter.value;
+      let rows = pollutantMatches.filter(d=>{
+        const finalCategory = catOf(d);
+        const text=`${d.formula} ${d.name} ${d.inchikey} ${d.suggestedCategory} ${finalCategory}`.toLowerCase();
+        if (category && finalCategory !== category) return false;
+        if (q && !text.includes(q)) return false;
+        if (!q && !category) return finalCategory !== "OTHER";
+        return true;
+      });
+      if (!q && !category) rows = rows.slice(0, 80);
+      const show = rows.slice(0, 150);
+      els.kpiPollutants.textContent = show.length;
+      els.pollutantRows.innerHTML = show.length
+        ? show.map(d=>`<tr><td>${esc(d.formula)}</td><td>${esc(d.name)}</td><td>${esc(d.inchikey)}</td><td>${esc(d.suggestedCategory)}</td><td><span class="badge">${esc(catOf(d))}</span></td></tr>`).join("")
+        : `<tr><td colspan="5" class="muted">无匹配结果</td></tr>`;
+      if (rows.length > show.length) {
+        els.pollutantRows.innerHTML += `<tr><td colspan="5" class="muted">共 ${rows.length} 条，先显示前 ${show.length} 条</td></tr>`;
+      }
+    }
+
+    async function compareWithLibrary() {
+      let formulas;
+      if (els.ftFile.files[0]) formulas=formulasFromCsv(await els.ftFile.files[0].text());
+      else formulas=els.manualInput.value.split(/[\s,;，；]+/).map(v=>v.trim()).filter(Boolean);
+      const index=new Map(fingerprintLibrary.map(d=>[key(d.formula),d]));
+      const rows=formulas.map(f=>{ const k=key(f); return {input:f,key:k,hit:index.get(k)}; });
+      const hitCount=rows.filter(r=>r.hit).length;
+      els.kpiInput.textContent=rows.length;
+      els.kpiHits.textContent=hitCount;
+      els.kpiRate.textContent=(rows.length? (100*hitCount/rows.length).toFixed(1):0)+"%";
+      els.compareRows.innerHTML=rows.map(r=>`<tr><td>${esc(r.input)}</td><td>${esc(r.key)}</td><td>${r.hit?"命中":"未命中"}</td><td>${r.hit?esc(r.hit.cls):"-"}</td><td>${r.hit?esc(r.hit.tier):"-"}</td></tr>`).join("") || `<tr><td colspan="5" class="muted">暂无结果</td></tr>`;
+    }
+
+    function feastStack(gate) {
+      const sum = FEAST_SRC.reduce((a,s)=>a+(gate[s.key]||0),0) || 1;
+      return FEAST_SRC.map(s => ({...s, v:(gate[s.key]||0)/sum}));
+    }
+    function feastBarHtml(gate) {
+      const parts = feastStack(gate);
+      const segs = parts.map(p=>`<span style="width:${(100*p.v).toFixed(2)}%;background:${p.color}" title="${p.label} ${(100*p.v).toFixed(1)}%"></span>`).join("");
+      const top = parts.slice().sort((a,b)=>b.v-a.v)[0];
+      const label = top ? `${top.label} ${(100*top.v).toFixed(0)}%` : "";
+      return `<div class="feast-row"><div class="small">${esc(gate.name)}</div><div class="feast-track">${segs}</div><div class="small muted">${esc(label)}</div></div>`;
+    }
+    function renderFeast() {
+      els.gateSelect.innerHTML = FEAST_GATES.map(g=>`<option value="${g.id}">${g.name}</option>`).join("");
+      els.feastLegend.innerHTML = FEAST_SRC.map(s=>`<span><i style="background:${s.color}"></i>${s.label}</span>`).join("");
+      const drawDetail = () => {
+        const g = FEAST_GATES.find(x=>x.id===els.gateSelect.value) || FEAST_GATES[0];
+        const parts = feastStack(g);
+        els.feastDetail.innerHTML = parts.map(p=>`<div class="feast-row"><div class="small">${p.label}</div><div class="feast-track"><span style="width:${(100*p.v).toFixed(2)}%;background:${p.color}"></span></div><div class="small">${(100*p.v).toFixed(1)}%</div></div>`).join("");
+      };
+      els.gateSelect.onchange = drawDetail;
+      els.gateSelect.value = "HUMEN";
+      drawDetail();
+      els.feastAll.innerHTML = FEAST_GATES.map(g=>feastBarHtml(g)).join("");
+    }
+
+    const classes=[...new Set(fingerprintLibrary.map(d=>d.cls))].sort();
+    els.filter.innerHTML = `<option value="">全部</option>` + classes.map(c=>`<option value="${c}">${c}</option>`).join("");
+    const cats=[...new Set(pollutantMatches.map(d=>catOf(d)))].filter(c=>c!=="OTHER").sort();
+    els.pollutantFilter.innerHTML = `<option value="">全部类别</option>` + cats.map(c=>`<option value="${c}">${c}</option>`).join("") + `<option value="OTHER">其他</option>`;
+
+    els.search.addEventListener("input", renderLibrary);
+    els.filter.addEventListener("change", renderLibrary);
+    document.getElementById("resetLibrary").addEventListener("click", ()=>{ els.search.value=""; els.filter.value=""; renderLibrary(); });
+    els.pollutantSearch.addEventListener("input", renderPollutants);
+    els.pollutantFilter.addEventListener("change", renderPollutants);
+    document.getElementById("compareBtn").addEventListener("click", ()=>compareWithLibrary().catch(err=>alert(err.message||err)));
+    document.getElementById("demoCompareBtn").addEventListener("click", ()=>{
+      els.manualInput.value = fingerprintLibrary.slice(0,6).map(d=>d.formula).concat(["C8H9NO2","C6H5NO3"]).join(", ");
+      compareWithLibrary();
+    });
+
+    renderTiers();
+    drawBar("pollutantChart", pollutantSummary);
+    drawBar("correlationChart", correlations, true);
+    drawHorizontalBar("libraryClassChart", classSummary);
+    renderLibrary();
+    renderPollutantKpis();
+    renderPollutants();
+    renderFeast();
+
+    const start = (location.hash || "#splash").replace("#","");
+    go(ROUTES[start] ? start : "splash");
+    window.addEventListener("hashchange", () => {
+      const id = location.hash.replace("#","");
+      if (ROUTES[id]) go(id);
+    });
+  </script>
+</body>
+</html>
