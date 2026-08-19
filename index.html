@@ -79,10 +79,10 @@
     .splash-cta:hover { transform: translateY(-1px); }
     .splash-stats {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
+      grid-template-columns: repeat(4, minmax(0,1fr));
       gap: 12px;
       margin: 40px auto 0;
-      max-width: 640px;
+      max-width: 820px;
     }
     .splash-stats div {
       padding: 14px 10px;
@@ -340,9 +340,9 @@
     }
     @media (max-width: 900px) {
       .cards2, .cards3, .cards4, .two, .library-panel, .water-grid, .splash-stats {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
       }
-      .water-grid { grid-template-columns: 1fr 1fr; }
+      .flow, .water-grid, .splash-stats { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -358,6 +358,7 @@
         <div><strong>184</strong><span>河口—河网样品</span></div>
         <div><strong>29</strong><span>城市河流样品</span></div>
         <div><strong>64</strong><span>污水终端样品</span></div>
+        <div><strong>233</strong><span>光学方法验证样品</span></div>
       </div>
     </div>
   </section>
@@ -445,7 +446,17 @@
         </div>
         <div class="fig-block">
           <img src="assets/report_figs/fig_sampling_map.png" alt="采样点分布图">
-          <div class="fig-cap">采样点分布：河口—河网时空样品、城市河流样品与污水终端样品。</div>
+          <div class="fig-cap">三类样品空间分布：河口—河网、城市河流与污水终端。</div>
+        </div>
+        <div class="grid two" style="margin-top:14px">
+          <div class="fig-block">
+            <img src="assets/report_figs/fig_estuary_sites.png" alt="河口河网时空监测点位">
+            <div class="fig-cap">河口—河网时空监测点位（背景库建库底图）。</div>
+          </div>
+          <div class="fig-block">
+            <img src="assets/report_figs/fig_estuary_env.png" alt="水体理化参数空间分布">
+            <div class="fig-cap">河口库配套环境底数：ORP、溶解氧、盐度与水温空间分布。</div>
+          </div>
         </div>
       </section>
 
@@ -469,6 +480,16 @@
             <p>点源指纹、分级核心库与污染物类别信息。</p>
           </button>
         </div>
+        <div class="grid two" style="margin-top:14px">
+          <div class="fig-block">
+            <img src="assets/report_figs/fig_estuary_ft.png" alt="河口库分子参数空间分布">
+            <div class="fig-cap">河口—河网背景库分子参数空间分布（分子数量、m/z、AI_mod、H/C、O/C、CRAM）。</div>
+          </div>
+          <div class="fig-block">
+            <img src="assets/report_figs/fig_urban_ft.png" alt="城市河流分子参数空间分布">
+            <div class="fig-cap">城市河流子库分子参数空间分布（H/C、O/C、m/z、AI_mod、DBE、CRAM）。</div>
+          </div>
+        </div>
       </section>
 
       <section id="view-feat-estuary" class="view">
@@ -485,6 +506,16 @@
             <li>咸潮、耗氧等过程可引起短期指纹波动</li>
           </ul>
           <p class="note">在 FEAST 中作为西江、东江、北江河系端元的指纹来源。</p>
+        </div>
+        <div class="grid two" style="margin-top:14px">
+          <div class="fig-block">
+            <img src="assets/report_figs/fig_estuary_env.png" alt="河口环境参数">
+            <div class="fig-cap">河口库环境底数空间分布。</div>
+          </div>
+          <div class="fig-block">
+            <img src="assets/report_figs/fig_estuary_ft.png" alt="河口分子参数">
+            <div class="fig-cap">河口库 FT-ICR MS 分子组成参数空间分布。</div>
+          </div>
         </div>
       </section>
 
@@ -503,6 +534,10 @@
           </ul>
           <p class="note">在口门溯源中作为城镇输移端元；横门、鸡啼门、洪奇沥等口门城镇信号相对抬升。</p>
         </div>
+        <div class="fig-block" style="margin-top:14px">
+          <img src="assets/report_figs/fig_urban_ft.png" alt="城市河流分子参数空间分布">
+          <div class="fig-cap">城市河流子库分子指纹参数空间分布。</div>
+        </div>
       </section>
 
       <section id="view-feat-wwtp" class="view">
@@ -519,6 +554,10 @@
             <li>按出现频率建立全样及 &gt;25% / &gt;50% / &gt;75% / 100% 分级核心库</li>
           </ul>
           <p class="note">作为点源端元参与口门解析，并支撑名录比对与样品分子式比对。</p>
+        </div>
+        <div class="fig-block" style="margin-top:14px">
+          <img src="assets/report_figs/fig_wwtp_graded_vk.png" alt="污水终端分级分子库">
+          <div class="fig-cap">污水终端排放库分级约束分子特征（全样至核心库）。</div>
         </div>
       </section>
 
