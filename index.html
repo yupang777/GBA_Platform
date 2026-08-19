@@ -682,7 +682,7 @@
         <div class="grid cards2">
           <button class="sub-card" type="button" data-go="pollutants">
             <strong>污染物名录比对</strong>
-            <p>按分子式、名称或用途类别检索名录映射结果。</p>
+            <p>对比对象：权威污染物名录；支持 CSV 上传与检索。</p>
           </button>
           <button class="sub-card" type="button" data-go="compare">
             <strong>样品分子式比对</strong>
@@ -695,21 +695,51 @@
         <div class="back-row"><button class="secondary" type="button" data-go="tools">← 返回工具</button></div>
         <div class="page-head">
           <h2>污染物名录比对</h2>
-          <p class="lead">指纹库与权威污染物名录比对后的映射检索。</p>
+          <p class="lead">上传或检索分子式，与权威污染物名录比对。</p>
+        </div>
+        <div class="callout" style="margin-bottom:12px">对比对象：<strong>权威污染物名录</strong>（Norman SusDat 等；全量映射 <span id="pollutantTotalHint">2968</span> 条）。下方用途统计为已标注示例，非全量。</div>
+        <div class="card pad library-panel" style="margin-bottom:14px">
+          <aside class="form-stack">
+            <div>
+              <label for="pollutantFile">上传 CSV</label>
+              <input id="pollutantFile" type="file" accept=".csv,text/csv">
+            </div>
+            <div>
+              <label for="pollutantManual">或粘贴分子式</label>
+              <textarea id="pollutantManual" placeholder="C8H9NO2, C10H14O4 ..."></textarea>
+            </div>
+            <div class="split-buttons">
+              <button id="pollutantCompareBtn" class="primary" type="button">开始比对</button>
+              <button id="pollutantDemoBtn" class="secondary" type="button">示例比对</button>
+            </div>
+            <div class="grid cards3">
+              <div class="kpi"><span>输入分子</span><strong id="kpiPolInput">0</strong></div>
+              <div class="kpi"><span>名录命中</span><strong id="kpiPolHits">0</strong></div>
+              <div class="kpi"><span>命中率</span><strong id="kpiPolRate">0%</strong></div>
+            </div>
+          </aside>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>输入分子式</th><th>是否命中名录</th><th>污染物名称</th><th>最终类别</th></tr></thead>
+              <tbody id="pollutantCompareRows"><tr><td colspan="4" class="muted">上传或粘贴分子式后查看结果</td></tr></tbody>
+            </table>
+          </div>
         </div>
         <div class="card pad grid">
+          <h3>用途类别示例（已标注子集）</h3>
+          <p class="small muted" style="margin:4px 0 10px">以下为污水终端分子与 Norman SusDat 等权威名录映射后、已标用途的示例条目，不是名录全量。全量映射见上方「当前映射」条数。</p>
           <div class="grid cards4" id="pollutantKpis"></div>
           <div class="grid two">
             <div>
-              <label for="pollutantSearch">检索</label>
+              <label for="pollutantSearch">检索示例 / 全量映射</label>
               <input id="pollutantSearch" type="text" placeholder="分子式 / 名称 / 类别">
             </div>
             <div>
               <label for="pollutantFilter">用途类别</label>
-              <select id="pollutantFilter"><option value="">全部类别</option></select>
+              <select id="pollutantFilter"><option value="">示例类别（默认）</option></select>
             </div>
           </div>
-          <div class="pill-line muted small">映射记录 <span id="pollutantCount">0</span> · 当前显示 <span id="kpiPollutants">0</span></div>
+          <div class="pill-line muted small">全量映射 <span id="pollutantCount">0</span> · 当前示例显示 <span id="kpiPollutants">0</span></div>
           <div class="table-wrap">
             <table>
               <thead><tr><th>分子式</th><th>污染物名称</th><th>InChIKey</th><th>建议类别</th><th>最终类别</th></tr></thead>
@@ -855,8 +885,15 @@
       pollutantFilter: document.getElementById("pollutantFilter"),
       pollutantRows: document.getElementById("pollutantRows"),
       pollutantCount: document.getElementById("pollutantCount"),
+      pollutantTotalHint: document.getElementById("pollutantTotalHint"),
       kpiPollutants: document.getElementById("kpiPollutants"),
       pollutantKpis: document.getElementById("pollutantKpis"),
+      pollutantFile: document.getElementById("pollutantFile"),
+      pollutantManual: document.getElementById("pollutantManual"),
+      pollutantCompareRows: document.getElementById("pollutantCompareRows"),
+      kpiPolInput: document.getElementById("kpiPolInput"),
+      kpiPolHits: document.getElementById("kpiPolHits"),
+      kpiPolRate: document.getElementById("kpiPolRate"),
       ftFile: document.getElementById("ftFile"),
       manualInput: document.getElementById("manualInput"),
       compareRows: document.getElementById("compareRows"),
@@ -979,10 +1016,10 @@
         counts[c] = (counts[c] || 0) + 1;
       });
       const focus = [
-        {key:"PPCPs", label:"PPCPs"},
-        {key:"dyestuff", label:"染料"},
-        {key:"plasticizer", label:"增塑剂"},
-        {key:"pesticide", label:"农药"}
+        {key:"PPCPs", label:"示例·PPCPs"},
+        {key:"dyestuff", label:"示例·染料"},
+        {key:"plasticizer", label:"示例·增塑剂"},
+        {key:"pesticide", label:"示例·农药"}
       ];
       els.pollutantKpis.innerHTML = focus.map(f => `
         <div class="kpi">
@@ -990,6 +1027,7 @@
           <strong>${counts[f.key] || 0}</strong>
         </div>`).join("");
       els.pollutantCount.textContent = pollutantMatches.length;
+      if (els.pollutantTotalHint) els.pollutantTotalHint.textContent = pollutantMatches.length;
     }
 
     function renderPollutants() {
@@ -1011,6 +1049,30 @@
         : `<tr><td colspan="5" class="muted">无匹配结果</td></tr>`;
       if (rows.length > show.length) {
         els.pollutantRows.innerHTML += `<tr><td colspan="5" class="muted">共 ${rows.length} 条，先显示前 ${show.length} 条</td></tr>`;
+      }
+    }
+
+    async function compareWithPollutantList() {
+      let formulas;
+      if (els.pollutantFile && els.pollutantFile.files[0]) formulas = formulasFromCsv(await els.pollutantFile.files[0].text());
+      else formulas = (els.pollutantManual?.value || "").split(/[\s,;，；]+/).map(v=>v.trim()).filter(Boolean);
+      const index = new Map();
+      pollutantMatches.forEach(d => {
+        const k = key(d.formula);
+        if (!index.has(k)) index.set(k, d);
+      });
+      const rows = formulas.map(f => {
+        const k = key(f);
+        return { input:f, hit:index.get(k) };
+      });
+      const hitCount = rows.filter(r => r.hit).length;
+      if (els.kpiPolInput) els.kpiPolInput.textContent = rows.length;
+      if (els.kpiPolHits) els.kpiPolHits.textContent = hitCount;
+      if (els.kpiPolRate) els.kpiPolRate.textContent = (rows.length ? (100 * hitCount / rows.length).toFixed(1) : 0) + "%";
+      if (els.pollutantCompareRows) {
+        els.pollutantCompareRows.innerHTML = rows.length
+          ? rows.map(r => `<tr><td>${esc(r.input)}</td><td>${r.hit ? "命中" : "未命中"}</td><td>${r.hit ? esc(r.hit.name) : "-"}</td><td>${r.hit ? esc(catOf(r.hit)) : "-"}</td></tr>`).join("")
+          : `<tr><td colspan="4" class="muted">暂无结果</td></tr>`;
       }
     }
 
@@ -1053,10 +1115,15 @@
     }
 
     const cats=[...new Set(pollutantMatches.map(d=>catOf(d)))].filter(c=>c!=="OTHER").sort();
-    els.pollutantFilter.innerHTML = `<option value="">全部类别</option>` + cats.map(c=>`<option value="${c}">${c}</option>`).join("") + `<option value="OTHER">其他</option>`;
+    els.pollutantFilter.innerHTML = `<option value="">示例类别（默认）</option>` + cats.map(c=>`<option value="${c}">${c}</option>`).join("") + `<option value="OTHER">其他（含未标用途）</option>`;
 
     els.pollutantSearch.addEventListener("input", renderPollutants);
     els.pollutantFilter.addEventListener("change", renderPollutants);
+    document.getElementById("pollutantCompareBtn").addEventListener("click", ()=>compareWithPollutantList().catch(err=>alert(err.message||err)));
+    document.getElementById("pollutantDemoBtn").addEventListener("click", ()=>{
+      els.pollutantManual.value = pollutantMatches.filter(d=>catOf(d)==="PPCPs").slice(0,4).map(d=>d.formula).concat(["C999H1"]).join(", ");
+      compareWithPollutantList();
+    });
     document.getElementById("compareBtn").addEventListener("click", ()=>compareWithLibrary().catch(err=>alert(err.message||err)));
     document.getElementById("demoCompareBtn").addEventListener("click", ()=>{
       els.manualInput.value = fingerprintLibrary.slice(0,6).map(d=>d.formula).concat(["C8H9NO2","C6H5NO3"]).join(", ");
