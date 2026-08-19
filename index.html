@@ -318,6 +318,26 @@
     ul.tight { margin: 8px 0 0; padding-left: 18px; }
     ul.tight li { margin: 3px 0; }
     .back-row { margin-bottom: 14px; }
+    .fig-block {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .fig-block img {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #fff;
+    }
+    .fig-cap {
+      padding: 10px 12px 12px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
     @media (max-width: 900px) {
       .cards2, .cards3, .cards4, .two, .library-panel, .water-grid, .splash-stats {
         grid-template-columns: 1fr;
@@ -423,6 +443,10 @@
             <p class="small muted">按场景划分为河口库、城市河流子库、污水终端库；终端库按出现频率建立分级约束，并与权威污染物名录比对。</p>
           </article>
         </div>
+        <div class="fig-block">
+          <img src="assets/report_figs/fig_sampling_map.png" alt="采样点分布图">
+          <div class="fig-cap">采样点分布：河口—河网时空样品、城市河流样品与污水终端样品。</div>
+        </div>
       </section>
 
       <!-- 02 三库 -->
@@ -525,6 +549,16 @@
           <div class="water-card"><b>污水</b><span class="small muted">人为排放</span></div>
           <div class="water-card"><b>应用</b><span class="small muted">快速归类与异常提示</span></div>
         </div>
+        <div class="grid two" style="margin-top:14px">
+          <div class="fig-block">
+            <img src="assets/report_figs/fig_optical_hk_map.png" alt="香港近岸采样点分布">
+            <div class="fig-cap">香港近岸方法验证采样点分布（233 个样品，七类水体）。</div>
+          </div>
+          <div class="fig-block">
+            <img src="assets/report_figs/fig_optical_eem.png" alt="光学指纹示意">
+            <div class="fig-cap">不同水体类型的吸收光谱与荧光指纹特征。</div>
+          </div>
+        </div>
       </section>
 
       <!-- 04 FEAST -->
@@ -545,6 +579,10 @@
             <h3>全部口门贡献结构</h3>
             <div id="feastAll" class="feast-bars" style="margin-top:10px"></div>
           </div>
+        </div>
+        <div class="fig-block">
+          <img src="assets/report_figs/fig_feast_gates.png" alt="FEAST口门源解析结果图">
+          <div class="fig-cap">口门 FEAST 源解析结果：（a）各口门源贡献；（b）各源贡献分布；（c）源×口门贡献。</div>
         </div>
       </section>
 
@@ -582,6 +620,16 @@
               <div class="chart-title"><strong>相关系数</strong></div>
               <svg id="correlationChart"></svg>
             </div>
+          </div>
+        </div>
+        <div class="grid two" style="margin-top:14px">
+          <div class="fig-block">
+            <img src="assets/report_figs/fig_wwtp_graded_vk.png" alt="分级约束分子库">
+            <div class="fig-cap">污水终端分级约束分子特征库（全样至核心库）。</div>
+          </div>
+          <div class="fig-block">
+            <img src="assets/report_figs/fig_gdp_nightlight_vk.png" alt="GDP与夜光相关分子">
+            <div class="fig-cap">夜光、GDP 与分子组成的相关富集/消耗特征。</div>
           </div>
         </div>
         <div class="card pad" style="margin-top:14px">
