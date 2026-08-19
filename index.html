@@ -673,28 +673,22 @@
         </div>
 
         <div class="card pad">
-          <h3>核心分子检索</h3>
-          <div class="library-panel" style="margin-top:12px">
+          <h3>单分子快速核对</h3>
+          <p class="small muted" style="margin:6px 0 12px">对比对象：<strong>污水终端核心分子库</strong>。输入一个分子式，查看它是否属于污水处理厂出水中的核心指纹分子（不是河口库、也不是城市河流库；批量样品请用第 06 模块）。</p>
+          <div class="library-panel">
             <aside class="form-stack">
               <div>
-                <label for="librarySearch">分子式</label>
+                <label for="librarySearch">待查分子式</label>
                 <input id="librarySearch" type="text" placeholder="例如 C10H14O4">
               </div>
-              <div>
-                <label for="classFilter">元素类别</label>
-                <select id="classFilter"><option value="">全部</option></select>
-              </div>
               <button id="resetLibrary" type="button" class="secondary">清空</button>
-              <div class="kpi"><span>核心库规模</span><strong id="kpiLibrary">0</strong></div>
+              <div class="kpi"><span>终端核心库条目</span><strong id="kpiLibrary">0</strong></div>
             </aside>
             <div class="grid">
-              <div class="chart-box">
-                <div class="chart-title"><strong>Van Krevelen</strong></div>
-                <svg id="vkChart"></svg>
-              </div>
+              <div class="callout" id="libraryHitMsg">请输入分子式，系统将与污水终端核心分子库比对。</div>
               <div class="table-wrap">
                 <table>
-                  <thead><tr><th>分子式</th><th>类别</th><th>O/C</th><th>H/C</th><th>定位</th></tr></thead>
+                  <thead><tr><th>分子式</th><th>比对结果</th><th>元素类别</th><th>O/C</th><th>H/C</th></tr></thead>
                   <tbody id="libraryRows"></tbody>
                 </table>
               </div>
@@ -881,7 +875,6 @@
 
     const els = {
       search: document.getElementById("librarySearch"),
-      filter: document.getElementById("classFilter"),
       libraryRows: document.getElementById("libraryRows"),
       pollutantSearch: document.getElementById("pollutantSearch"),
       pollutantFilter: document.getElementById("pollutantFilter"),
@@ -1003,19 +996,24 @@
     }
 
     function renderLibrary() {
-      const q=els.search.value.trim().toLowerCase();
-      const cls=els.filter.value;
+      const q=els.search.value.trim();
+      const qLower=q.toLowerCase();
       els.kpiLibrary.textContent = fingerprintLibrary.length;
-      if (!q && !cls) {
-        els.libraryRows.innerHTML = `<tr><td colspan="5" class="muted">输入分子式开始检索</td></tr>`;
-        drawScatter("vkChart", []);
+      const msg = document.getElementById("libraryHitMsg");
+      if (!q) {
+        els.libraryRows.innerHTML = `<tr><td colspan="5" class="muted">尚未输入</td></tr>`;
+        if (msg) msg.textContent = "请输入分子式，系统将与污水终端核心分子库比对。";
         return;
       }
-      const rows=fingerprintLibrary.filter(d => (!q || d.formula.toLowerCase().includes(q) || d.cls.toLowerCase().includes(q)) && (!cls || d.cls===cls)).slice(0,50);
+      const rows=fingerprintLibrary.filter(d => d.formula.toLowerCase().includes(qLower)).slice(0,30);
+      if (msg) {
+        msg.textContent = rows.length
+          ? `比对对象：污水终端核心分子库。命中 ${rows.length} 条（展示前 ${Math.min(rows.length,30)} 条）。`
+          : "比对对象：污水终端核心分子库。未命中——该分子式不在当前终端核心指纹条目中。";
+      }
       els.libraryRows.innerHTML = rows.length
-        ? rows.map(d=>`<tr><td>${esc(d.formula)}</td><td><span class="badge ${d.cls}">${d.cls}</span></td><td>${Number(d.oc).toFixed(3)}</td><td>${Number(d.hc).toFixed(3)}</td><td>${esc(d.tier)}</td></tr>`).join("")
-        : `<tr><td colspan="5" class="muted">无匹配结果</td></tr>`;
-      drawScatter("vkChart", rows);
+        ? rows.map(d=>`<tr><td>${esc(d.formula)}</td><td>命中终端核心库</td><td><span class="badge ${d.cls}">${d.cls}</span></td><td>${Number(d.oc).toFixed(3)}</td><td>${Number(d.hc).toFixed(3)}</td></tr>`).join("")
+        : `<tr><td>${esc(q)}</td><td>未命中</td><td colspan="3" class="muted">—</td></tr>`;
     }
 
     function catOf(d){ return d.finalCategory || d.suggestedCategory || "未分类"; }
@@ -1100,14 +1098,11 @@
       els.feastAll.innerHTML = FEAST_GATES.map(g=>feastBarHtml(g)).join("");
     }
 
-    const classes=[...new Set(fingerprintLibrary.map(d=>d.cls))].sort();
-    els.filter.innerHTML = `<option value="">全部</option>` + classes.map(c=>`<option value="${c}">${c}</option>`).join("");
     const cats=[...new Set(pollutantMatches.map(d=>catOf(d)))].filter(c=>c!=="OTHER").sort();
     els.pollutantFilter.innerHTML = `<option value="">全部类别</option>` + cats.map(c=>`<option value="${c}">${c}</option>`).join("") + `<option value="OTHER">其他</option>`;
 
     els.search.addEventListener("input", renderLibrary);
-    els.filter.addEventListener("change", renderLibrary);
-    document.getElementById("resetLibrary").addEventListener("click", ()=>{ els.search.value=""; els.filter.value=""; renderLibrary(); });
+    document.getElementById("resetLibrary").addEventListener("click", ()=>{ els.search.value=""; renderLibrary(); });
     els.pollutantSearch.addEventListener("input", renderPollutants);
     els.pollutantFilter.addEventListener("change", renderPollutants);
     document.getElementById("compareBtn").addEventListener("click", ()=>compareWithLibrary().catch(err=>alert(err.message||err)));
