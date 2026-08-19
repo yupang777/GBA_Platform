@@ -406,14 +406,14 @@
           </button>
           <button class="module-card" type="button" data-go="terminal">
             <span class="no">05</span>
-            <strong>终端库与污染物类别</strong>
-            <p>分级约束指纹库、污染物类别与社会经济关联摘要。</p>
+            <strong>终端指纹库</strong>
+            <p>分级约束指纹、元素组成，以及 GDP/夜光关联结果。</p>
             <span class="go">进入 →</span>
           </button>
           <button class="module-card" type="button" data-go="tools">
             <span class="no">06</span>
             <strong>名录比对与样品比对</strong>
-            <p>污染物名录检索，以及样品分子式与终端库比对。</p>
+            <p>污染物名录检索与检出比对，以及样品分子式命中核对。</p>
             <span class="go">进入 →</span>
           </button>
         </div>
@@ -433,30 +433,20 @@
         <div class="grid cards3">
           <article class="card pad">
             <h3>样品与检测</h3>
-            <p class="small muted">同步获取水温、溶解氧、氧化还原电位、盐度等理化参数，以及土地利用、夜间灯光、GDP 等社会经济背景；完成 DOC、三维荧光与 FT-ICR MS 测试。</p>
+            <p class="small muted">同步获取水温、溶解氧、氧化还原电位、盐度等理化参数；完成 DOC、三维荧光与 FT-ICR MS 测试。</p>
           </article>
           <article class="card pad">
             <h3>元数据字段</h3>
-            <p class="small muted">点位与批次、环境与社会经济背景、荧光指数与 PARAFAC 组分、分子式及 H/C、O/C、AI_mod、DBE、CRAM 等参数。</p>
+            <p class="small muted">点位与批次、水体环境背景、荧光指数与 PARAFAC 组分、分子式及 H/C、O/C、AI_mod、DBE、CRAM 等参数。</p>
           </article>
           <article class="card pad">
             <h3>入库规则</h3>
-            <p class="small muted">按场景划分为河口库、城市河流子库、污水终端库；终端库按出现频率建立分级约束，并与权威污染物名录比对。</p>
+            <p class="small muted">按场景划分为河口库、城市河流子库、污水终端库；终端库按出现频率建立分级约束。</p>
           </article>
         </div>
         <div class="fig-block">
           <img src="assets/report_figs/fig_sampling_map.png" alt="采样点分布图">
           <div class="fig-cap">三类样品空间分布：河口—河网、城市河流与污水终端。</div>
-        </div>
-        <div class="grid two" style="margin-top:14px">
-          <div class="fig-block">
-            <img src="assets/report_figs/fig_estuary_sites.png" alt="河口河网时空监测点位">
-            <div class="fig-cap">河口—河网时空监测点位（背景库建库底图）。</div>
-          </div>
-          <div class="fig-block">
-            <img src="assets/report_figs/fig_estuary_env.png" alt="水体理化参数空间分布">
-            <div class="fig-cap">河口库配套环境底数：ORP、溶解氧、盐度与水温空间分布。</div>
-          </div>
         </div>
       </section>
 
@@ -483,11 +473,11 @@
         <div class="grid two" style="margin-top:14px">
           <div class="fig-block">
             <img src="assets/report_figs/fig_estuary_ft.png" alt="河口库分子参数空间分布">
-            <div class="fig-cap">河口—河网背景库分子参数空间分布（分子数量、m/z、AI_mod、H/C、O/C、CRAM）。</div>
+            <div class="fig-cap">河口—河网背景库：分子参数空间分布。</div>
           </div>
           <div class="fig-block">
-            <img src="assets/report_figs/fig_urban_ft.png" alt="城市河流分子参数空间分布">
-            <div class="fig-cap">城市河流子库分子参数空间分布（H/C、O/C、m/z、AI_mod、DBE、CRAM）。</div>
+            <img src="assets/report_figs/fig_urban_time.png" alt="城市河流月度分子参数变化">
+            <div class="fig-cap">城市河流子库：代表断面月度分子参数变化。</div>
           </div>
         </div>
       </section>
@@ -534,9 +524,15 @@
           </ul>
           <p class="note">在口门溯源中作为城镇输移端元；横门、鸡啼门、洪奇沥等口门城镇信号相对抬升。</p>
         </div>
-        <div class="fig-block" style="margin-top:14px">
-          <img src="assets/report_figs/fig_urban_ft.png" alt="城市河流分子参数空间分布">
-          <div class="fig-cap">城市河流子库分子指纹参数空间分布。</div>
+        <div class="grid two" style="margin-top:14px">
+          <div class="fig-block">
+            <img src="assets/report_figs/fig_urban_time.png" alt="城市河流月度变化">
+            <div class="fig-cap">代表断面分子参数的月度变化。</div>
+          </div>
+          <div class="fig-block">
+            <img src="assets/report_figs/fig_urban_cca.png" alt="城市河流环境驱动分析">
+            <div class="fig-cap">分子组成与降水径流、土地利用、气温等环境因子的对应分析。</div>
+          </div>
         </div>
       </section>
 
@@ -628,50 +624,55 @@
       <!-- 05 终端库 -->
       <section id="view-terminal" class="view">
         <div class="page-head">
-          <h2>终端库与污染物类别</h2>
-          <p class="lead">展示污水终端指纹库的分级约束、潜在污染物类别与分子组成概览。</p>
+          <h2>终端指纹库</h2>
+          <p class="lead">本页分两块：上半为指纹库本身（分级约束与元素组成）；下半为社会经济驱动结果。污染物名录检索与检出比对见第 06 模块。</p>
         </div>
-        <div class="grid two">
-          <div class="card pad">
-            <h3>分级约束</h3>
-            <p class="small muted">由全样到 100% 核心库逐步收紧，用于锁定城镇污水共性指纹。</p>
-            <div class="tier-list" id="tierList"></div>
-          </div>
-          <div class="card pad">
-            <h3>潜在污染物类别</h3>
-            <div class="chart-box" style="margin-top:10px">
-              <div class="chart-title"><strong>类别占比</strong></div>
-              <svg id="pollutantChart"></svg>
+
+        <div class="card pad" style="margin-bottom:14px">
+          <h3>一、指纹库结构</h3>
+          <p class="small muted">按出现频率建立分级约束，刻画污水终端共性分子指纹。</p>
+          <div class="grid two" style="margin-top:12px">
+            <div>
+              <div class="tier-list" id="tierList"></div>
             </div>
-          </div>
-        </div>
-        <div class="grid two" style="margin-top:14px">
-          <div class="card pad">
-            <h3>元素组成概览</h3>
-            <div class="chart-box" style="margin-top:10px">
-              <div class="chart-title"><strong>全样点累计</strong></div>
+            <div class="chart-box">
+              <div class="chart-title"><strong>元素组成概览</strong><span class="muted">全样点累计</span></div>
               <svg id="libraryClassChart"></svg>
             </div>
           </div>
-          <div class="card pad">
-            <h3>社会经济与水质关联</h3>
-            <div class="chart-box" style="margin-top:10px">
-              <div class="chart-title"><strong>相关系数</strong></div>
+          <div class="fig-block" style="margin-top:12px">
+            <img src="assets/report_figs/fig_wwtp_graded_vk.png" alt="分级约束分子库">
+            <div class="fig-cap">分级约束分子特征库（全样至 100% 核心库）。</div>
+          </div>
+        </div>
+
+        <div class="card pad" style="margin-bottom:14px">
+          <h3>二、社会经济驱动（GDP / 夜光）</h3>
+          <p class="small muted">说明宏观发展水平如何影响终端出水有机质组成。逐条污染物名录检索见第 06 模块。</p>
+          <div class="grid two" style="margin-top:12px">
+            <div class="chart-box">
+              <div class="chart-title"><strong>相关摘要</strong></div>
               <svg id="correlationChart"></svg>
             </div>
+            <div class="chart-box">
+              <div class="chart-title"><strong>潜在污染物类别结构</strong><span class="muted">报告汇总口径</span></div>
+              <svg id="pollutantChart"></svg>
+            </div>
           </div>
+          <div class="grid two" style="margin-top:12px">
+            <div class="fig-block">
+              <img src="assets/report_figs/fig_wwtp_gdp_map.png" alt="GDP夜光与DOC空间分布">
+              <div class="fig-cap">采样点、夜光与 GDP 背景下的 DOC 空间分布。</div>
+            </div>
+            <div class="fig-block">
+              <img src="assets/report_figs/fig_gdp_nightlight_vk.png" alt="GDP与夜光相关分子">
+              <div class="fig-cap">与夜光、GDP 呈正/负相关的分子在 VK 空间中的分布。</div>
+            </div>
+          </div>
+          <p class="note">工业化学品、PPCPs 等类别的逐条名录检索与样品检出比对，请进入「名录比对与样品比对」模块。</p>
         </div>
-        <div class="grid two" style="margin-top:14px">
-          <div class="fig-block">
-            <img src="assets/report_figs/fig_wwtp_graded_vk.png" alt="分级约束分子库">
-            <div class="fig-cap">污水终端分级约束分子特征库（全样至核心库）。</div>
-          </div>
-          <div class="fig-block">
-            <img src="assets/report_figs/fig_gdp_nightlight_vk.png" alt="GDP与夜光相关分子">
-            <div class="fig-cap">夜光、GDP 与分子组成的相关富集/消耗特征。</div>
-          </div>
-        </div>
-        <div class="card pad" style="margin-top:14px">
+
+        <div class="card pad">
           <h3>核心分子检索</h3>
           <div class="library-panel" style="margin-top:12px">
             <aside class="form-stack">
@@ -706,7 +707,7 @@
       <section id="view-tools" class="view">
         <div class="page-head">
           <h2>名录比对与样品比对</h2>
-          <p class="lead">选择下方工具继续。</p>
+          <p class="lead">本模块对应“污染物检出 / 名录比对”：检索权威名录映射，并核对样品分子式是否命中终端核心指纹。</p>
         </div>
         <div class="grid cards2">
           <button class="sub-card" type="button" data-go="pollutants">
@@ -797,7 +798,7 @@
       "feat-wwtp": { title: "污水终端排放库", parent: "features" },
       optical: { title: "光学快速检测", parent: "hub" },
       feast: { title: "FEAST 口门溯源", parent: "hub" },
-      terminal: { title: "终端库与污染物类别", parent: "hub" },
+      terminal: { title: "终端指纹库", parent: "hub" },
       tools: { title: "名录比对与样品比对", parent: "hub" },
       pollutants: { title: "污染物名录比对", parent: "tools" },
       compare: { title: "样品分子式比对", parent: "tools" }
