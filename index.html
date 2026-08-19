@@ -671,29 +671,22 @@
           </div>
           <p class="note">工业化学品、PPCPs 等类别的逐条名录检索与样品检出比对，请进入「名录比对与样品比对」模块。</p>
         </div>
-
-        <div class="card pad">
-          <h3>比对入口说明</h3>
-          <p class="small muted" style="margin:6px 0 10px">本页只展示污水终端指纹库结构与驱动关系，<strong>不做样品比对</strong>（避免与第 06 模块重复）。</p>
-          <div class="callout">对比对象（最严格）：<strong>污水终端 100% 核心指纹库</strong>——在 29 个污水处理厂样品中均检出的分子，共 <strong id="kpiCoreCount">1385</strong> 条。样品分子式上传/粘贴比对请进入第 06 模块「样品分子式比对」。</div>
-          <div style="margin-top:12px"><button class="primary" type="button" data-go="compare">前往样品分子式比对 →</button></div>
-        </div>
       </section>
 
       <!-- 06 工具入口 -->
       <section id="view-tools" class="view">
         <div class="page-head">
           <h2>名录比对与样品比对</h2>
-          <p class="lead">两类比对对象不同：名录比对对照权威污染物名录；样品比对对照污水终端 100% 核心指纹库。</p>
+          <p class="lead">名录检索与样品分子式命中核对。</p>
         </div>
         <div class="grid cards2">
           <button class="sub-card" type="button" data-go="pollutants">
             <strong>污染物名录比对</strong>
-            <p>对比对象：权威污染物名录映射结果（按分子式/名称/类别检索）。</p>
+            <p>按分子式、名称或用途类别检索名录映射结果。</p>
           </button>
           <button class="sub-card" type="button" data-go="compare">
             <strong>样品分子式比对</strong>
-            <p>对比对象：污水终端 100% 核心指纹库（29 站共现，1385 条）。</p>
+            <p>对照污水终端 100% 核心指纹库（29 站共现，1385 条）。</p>
           </button>
         </div>
       </section>
@@ -732,7 +725,7 @@
           <h2>样品分子式比对</h2>
           <p class="lead">上传 CSV 或粘贴分子式清单，检查是否命中污水终端最严格核心指纹。</p>
         </div>
-        <div class="callout" style="margin-bottom:12px">对比对象：<strong>污水终端 100% 核心指纹库</strong>（29 个污水处理厂样品共现分子，共 <span id="kpiLibrary">1385</span> 条）。不是河口库、不是城市河流库，也不是污染物名录。</div>
+        <div class="callout" style="margin-bottom:12px">对比对象：<strong>污水终端 100% 核心指纹库</strong>（29 个污水处理厂共现分子，共 <span id="kpiLibrary">1385</span> 条）。</div>
         <div class="card pad library-panel">
           <aside class="form-stack">
             <div>
@@ -868,7 +861,6 @@
       manualInput: document.getElementById("manualInput"),
       compareRows: document.getElementById("compareRows"),
       kpiLibrary: document.getElementById("kpiLibrary"),
-      kpiCoreCount: document.getElementById("kpiCoreCount"),
       kpiInput: document.getElementById("kpiInput"),
       kpiHits: document.getElementById("kpiHits"),
       kpiRate: document.getElementById("kpiRate"),
@@ -1072,7 +1064,6 @@
     });
 
     if (els.kpiLibrary) els.kpiLibrary.textContent = fingerprintLibrary.length;
-    if (els.kpiCoreCount) els.kpiCoreCount.textContent = fingerprintLibrary.length;
     renderTiers();
     drawBar("pollutantChart", pollutantSummary);
     drawBar("correlationChart", correlations, true);
